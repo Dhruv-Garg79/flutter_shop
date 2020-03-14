@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_zone/providers/cart.dart';
+import 'package:shop_zone/providers/orders.dart';
 import 'package:shop_zone/providers/products.dart';
+import 'package:shop_zone/screens/cart_screen.dart';
+import 'package:shop_zone/screens/orders_screen.dart';
 import 'package:shop_zone/screens/product_detail_screen.dart';
 import 'package:shop_zone/screens/product_overview_screen.dart';
 
@@ -10,8 +14,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (ctx) => Products(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (ctx) => Products(),
+        ),
+        ChangeNotifierProvider.value(
+          value: Cart(),
+        ),
+        ChangeNotifierProvider.value(
+          value: Orders(),
+        )
+      ],
       child: MaterialApp(
         title: 'SHOP ZONE',
         debugShowCheckedModeBanner: false,
@@ -25,6 +39,8 @@ class MyApp extends StatelessWidget {
         home: ProductOverviewScreen(),
         routes: {
           ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+          CartScreen.routeName: (ctx) => CartScreen(),
+          OrdersScreen.routeName: (ctx) => OrdersScreen(),
         },
       ),
     );
