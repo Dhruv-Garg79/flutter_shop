@@ -40,7 +40,8 @@ class CartScreen extends StatelessWidget {
                   RaisedButton(
                     child: Text('Order Now'),
                     onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(cartprovider.itemValues, cartprovider.totalAmount);
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                          cartprovider.itemValues, cartprovider.totalAmount);
                       cartprovider.clear();
                     },
                     color: Theme.of(context).primaryColorLight,
@@ -52,7 +53,8 @@ class CartScreen extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               itemBuilder: (_, i) {
-                return buildCartItem(context, cartprovider.itemKeys[i], cartprovider.itemValues[i]);
+                return buildCartItem(context, cartprovider.itemKeys[i],
+                    cartprovider.itemValues[i]);
               },
               itemCount: cartprovider.itemCount,
             ),
@@ -62,7 +64,8 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget buildCartItem(BuildContext context, String productId ,CartItem cartItem) {
+  Widget buildCartItem(
+      BuildContext context, String productId, CartItem cartItem) {
     final provider = Provider.of<Cart>(context);
     return Dismissible(
       key: ValueKey(cartItem.id),
@@ -70,10 +73,33 @@ class CartScreen extends StatelessWidget {
         color: Theme.of(context).errorColor,
         child: Icon(Icons.delete),
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right : 16),
+        padding: EdgeInsets.only(right: 16),
       ),
       direction: DismissDirection.endToStart,
-      onDismissed: (dir){
+      confirmDismiss: (dir) {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('Are you sure?'),
+            content: Text('Do you want to remove this item from cart?'),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: Text('Yes'),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: Text('No'),
+              ),
+            ],
+          ),
+        );
+      },
+      onDismissed: (dir) {
         provider.removeItem(productId);
       },
       child: Card(
@@ -119,12 +145,14 @@ class CartScreen extends StatelessWidget {
                       margin: EdgeInsets.only(top: 8.0),
                       child: Row(children: <Widget>[
                         IconButton(
-                          onPressed: () => provider.decrementQuantityFor(productId),
+                          onPressed: () =>
+                              provider.decrementQuantityFor(productId),
                           icon: Icon(Icons.remove),
                         ),
                         Text(cartItem.quantity.toString()),
                         IconButton(
-                          onPressed: () => provider.incrementQuantityFor(productId),
+                          onPressed: () =>
+                              provider.incrementQuantityFor(productId),
                           icon: Icon(Icons.add),
                         ),
                       ]),
