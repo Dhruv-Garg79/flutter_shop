@@ -44,6 +44,8 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<Products>(context, listen: false);
+
     return Card(
       child: ListTile(
         leading: CircleAvatar(
@@ -57,13 +59,13 @@ class UserProductItem extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.edit),
                 onPressed: () {
-                  // Navigator.of(context).pushNamed(EditProductScreen.routeName);
+                  Navigator.of(context).pushNamed(EditProductScreen.routeName, arguments: product);
                 },
               ),
               IconButton(
                 icon: Icon(Icons.delete),
                 color: Theme.of(context).errorColor,
-                onPressed: () {},
+                onPressed: () => productProvider.removeProduct(product.id),
               )
             ],
           ),
