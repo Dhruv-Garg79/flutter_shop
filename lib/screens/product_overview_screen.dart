@@ -16,6 +16,22 @@ class ProductOverviewScreen extends StatefulWidget {
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   bool _showOnlyFavs = false;
+  bool _isInit = true;
+  bool _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      _isLoading = true;
+      Provider.of<Products>(context, listen: false).fetchProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,19 +58,23 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
             },
           ),
           Consumer<Cart>(
-            builder: (_, cartData, ch) => Badge(
-              child: ch,
-              value: cartData.itemCount.toString(),
-            ),
-            child: IconButton(
+              builder: (_, cartData, ch) => Badge(
+                    child: ch,
+                    value: cartData.itemCount.toString(),
+                  ),
+              child: IconButton(
                 icon: Icon(Icons.shopping_cart),
-                onPressed: () => Navigator.of(context).pushNamed(CartScreen.routeName),
-              )
-          ),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(CartScreen.routeName),
+              )),
         ],
       ),
       drawer: MainDrawer(),
-      body: ProductsGrid(_showOnlyFavs),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavs),
     );
   }
 }
