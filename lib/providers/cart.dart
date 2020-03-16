@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 class CartItem {
@@ -10,6 +12,34 @@ class CartItem {
 
   CartItem(
       this.id, this.title, this.desc, this.quantity, this.price, this.imageUrl);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'desc': desc,
+      'quantity': quantity,
+      'price': price,
+      'imageUrl': imageUrl,
+    };
+  }
+
+  static CartItem fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+  
+    return CartItem(
+      map['id'],
+      map['title'],
+      map['desc'],
+      map['quantity'],
+      map['price'],
+      map['imageUrl'],
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  static CartItem fromJson(String source) => fromMap(json.decode(source));
 }
 
 class Cart with ChangeNotifier {

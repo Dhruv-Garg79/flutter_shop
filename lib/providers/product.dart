@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart';
+import 'package:shop_zone/constants.dart';
+import 'package:shop_zone/models/http_exception.dart';
 
 class Product with ChangeNotifier {
   final String id;
@@ -9,7 +12,7 @@ class Product with ChangeNotifier {
   final double price;
   final String imageUrl;
   bool isFavorite;
-  
+
   Product({
     @required this.id,
     @required this.title,
@@ -18,10 +21,29 @@ class Product with ChangeNotifier {
     @required this.imageUrl,
     this.isFavorite = false,
   });
-  
-  void toggleFav(){
+
+  Future<void> toggleFav() async {
+    final oldValue = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
+    try {
+      final url = '${Constants.baseUrl}/products/$id.json';
+      final res = await patch(
+        url,
+        body: json.encode({
+          'isFavorite': isFavorite,
+        }),
+      );
+      if (res.statusCode >= 400) {
+        isFavorite = oldValue;
+        notifyListeners();
+        throw HttpException('Favoriting product failed');
+      }
+    } catch (error) {
+      isFavorite = oldValue;
+      notifyListeners();
+      throw error;
+    }
   }
 
   Map<String, dynamic> toMap() {
@@ -36,7 +58,7 @@ class Product with ChangeNotifier {
 
   static Product fromMap(Map<String, dynamic> map) {
     if (map == null) return null;
-  
+
     return Product(
       id: map['id'],
       title: map['title'],

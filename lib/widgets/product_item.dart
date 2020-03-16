@@ -36,7 +36,14 @@ class ProductItem extends StatelessWidget {
                 color: pro.isFavorite
                     ? Theme.of(context).primaryColor
                     : Theme.of(context).primaryColorLight,
-                onPressed: () => pro.toggleFav(),
+                onPressed: () async {
+                  try {
+                    await pro.toggleFav();
+                  }
+                  catch (error) {
+                    Scaffold.of(context).showSnackBar(SnackBar(content: Text('Something went wrong! Favorite failed'),));
+                  }
+                },
               );
             },
           ),

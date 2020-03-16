@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop_zone/constants.dart';
+import 'package:shop_zone/models/http_exception.dart';
 import 'package:shop_zone/providers/product.dart';
 
 class Products with ChangeNotifier {
-  static const _baseUrl = 'https://flutter-shop-a0adc.firebaseio.com';
 
   List<Product> _items = [
     // Product(
@@ -55,7 +56,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchProducts() async {
-    const url = '$_baseUrl/products.json';
+    const url = '${Constants.baseUrl}/products.json';
 
     try {
       final response = await http.get(url);
@@ -82,7 +83,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    const url = '$_baseUrl/products.json';
+    const url = '${Constants.baseUrl}/products.json';
 
     try {
       final response = await http.post(url, body: product.toJson());
@@ -108,9 +109,9 @@ class Products with ChangeNotifier {
     final index = _items.indexWhere((test) => test.id == product.id);
     if (index >= 0) {
       try {
-        final url = '$_baseUrl/products/${product.id}.json';
+        final url = '${Constants.baseUrl}/products/${product.id}.json';
         await http.patch(url, body: product.toJson());
-        
+
         _items[index] = product;
         notifyListeners();
       } catch (error) {
@@ -120,8 +121,19 @@ class Products with ChangeNotifier {
     }
   }
 
-  void removeProduct(String id) {
-    _items.removeWhere((val) => val.id == id);
+  Future<void> removeProduct(String id) async {
+    final existingProductIndex = _items.indexWhere((test) => test.id == id);
+    final existingProduct = _items[existingProductIndex];
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+
+    final url = '${Constants.baseUrl}/products/$id.json';
+    final res = await http.delete(url);
+    if (res.statusCode >= 400) {
+      // rollback if fails
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('delete failed');
+    }
   }
 }

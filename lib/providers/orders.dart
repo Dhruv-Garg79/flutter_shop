@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/widgets.dart';
+
 import 'package:shop_zone/providers/cart.dart';
 
 class OrderItem {
@@ -13,6 +16,30 @@ class OrderItem {
     @required this.items,
     @required this.dateTime,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'amount': amount,
+      'items': List<dynamic>.from(items.map((x) => x.toMap())),
+      'dateTime': dateTime.millisecondsSinceEpoch,
+    };
+  }
+
+  static OrderItem fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+  
+    return OrderItem(
+      id: map['id'],
+      amount: map['amount'],
+      items: List<CartItem>.from(map['items']?.map((x) => CartItem.fromMap(x))),
+      dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  static OrderItem fromJson(String source) => fromMap(json.decode(source));
 }
 
 class Orders with ChangeNotifier {
