@@ -16,49 +16,45 @@ class CartScreen extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top : 8.0),
+              child: ListView.builder(
+                itemBuilder: (_, i) {
+                  return buildCartItem(context, cartprovider.itemKeys[i],
+                      cartprovider.itemValues[i]);
+                },
+                itemCount: cartprovider.itemCount,
+              ),
+            ),
+          ),
           Card(
-            margin: EdgeInsets.all(16.0),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Text(
+                    'Your Total : ',
+                    style: TextStyle(fontSize: 14),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
-                        'Your Total : ',
-                        style: TextStyle(fontSize: 18),
-                      ),
                       Chip(
+                        padding: EdgeInsets.symmetric(horizontal : 4.0),
                         label: Text(
                           cartprovider.totalAmount.toString(),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
+                      OrderButton(cartprovider: cartprovider)
                     ],
                   ),
-                  RaisedButton(
-                    child: Text('Order Now'),
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                          cartprovider.itemValues, cartprovider.totalAmount);
-                      cartprovider.clear();
-                    },
-                    color: Theme.of(context).primaryColorLight,
-                  )
                 ],
               ),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (_, i) {
-                return buildCartItem(context, cartprovider.itemKeys[i],
-                    cartprovider.itemValues[i]);
-              },
-              itemCount: cartprovider.itemCount,
-            ),
-          )
         ],
       ),
     );
@@ -164,6 +160,41 @@ class CartScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key key,
+    @required this.cartprovider,
+  }) : super(key: key);
+
+  final Cart cartprovider;
+
+  @override
+  _OrderButtonState createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  bool isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: isLoading ? CircularProgressIndicator() : Text('Order Now'),
+      onPressed: widget.cartprovider.totalAmount <= 0 || isLoading
+          ? null
+          : () async {
+              setState(() => isLoading = true);
+              await Provider.of<Orders>(context, listen: false).addOrder(
+                widget.cartprovider.itemValues,
+                widget.cartprovider.totalAmount,
+              );
+              setState(() => isLoading = false);
+              widget.cartprovider.clear();
+            },
+      color: Theme.of(context).primaryColorLight,
     );
   }
 }
