@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop_zone/providers/auth.dart';
 import 'package:shop_zone/screens/orders_screen.dart';
 import 'package:shop_zone/screens/user_products_screen.dart';
 
@@ -32,6 +34,14 @@ class MainDrawer extends StatelessWidget {
             title: Text('Manage Products'),
             onTap: () {
               Navigator.of(context).pushReplacementNamed(UserProductScreen.routeName);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Logout'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Provider.of<Auth>(context, listen: false).logout();
             },
           )
         ],

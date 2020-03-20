@@ -22,17 +22,15 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-  Future<void> toggleFav() async {
+  Future<void> toggleFav(String token, String userId) async {
     final oldValue = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
     try {
-      final url = '${Constants.baseUrl}/products/$id.json';
-      final res = await patch(
+      final url = '${Constants.baseUrl}/favProducts/$userId/$id.json?auth=$token';
+      final res = await put(
         url,
-        body: json.encode({
-          'isFavorite': isFavorite,
-        }),
+        body: json.encode(isFavorite),
       );
       if (res.statusCode >= 400) {
         isFavorite = oldValue;
@@ -52,7 +50,6 @@ class Product with ChangeNotifier {
       'description': description,
       'price': price,
       'imageUrl': imageUrl,
-      'isFavorite': isFavorite,
     };
   }
 
@@ -64,8 +61,7 @@ class Product with ChangeNotifier {
       title: map['title'],
       description: map['description'],
       price: map['price'],
-      imageUrl: map['imageUrl'],
-      isFavorite: map['isFavorite'],
+      imageUrl: map['imageUrl']
     );
   }
 

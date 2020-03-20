@@ -10,6 +10,9 @@ import 'package:shop_zone/widgets/product_item.dart';
 enum FilterOptions { Fav, All }
 
 class ProductOverviewScreen extends StatefulWidget {
+
+  static const routeName = '/productOverview';
+
   @override
   _ProductOverviewScreenState createState() => _ProductOverviewScreenState();
 }
