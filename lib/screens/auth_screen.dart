@@ -106,7 +106,7 @@ class _AuthCardState extends State<AuthCard>
   final _passwordController = TextEditingController();
   AnimationController _animationController;
   Animation<Size> _heightAnimation;
- 
+
   @override
   void initState() {
     _animationController = AnimationController(
@@ -117,7 +117,8 @@ class _AuthCardState extends State<AuthCard>
     _heightAnimation = Tween<Size>(
       begin: Size(double.infinity, 260),
       end: Size(double.infinity, 320),
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.linear));
+    ).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.linear));
 
     _heightAnimation.addListener(() => setState(() {}));
 
@@ -215,13 +216,17 @@ class _AuthCardState extends State<AuthCard>
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
-        // height: _authMode == AuthMode.Signup ? 320 : 260,
-        height: _heightAnimation.value.height,
-        constraints:
-            BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
-        width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+      child: AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (ctx, childWidget) => Container(
+          // height: _authMode == AuthMode.Signup ? 320 : 260,
+          height: _heightAnimation.value.height,
+          constraints: BoxConstraints(
+              minHeight: _authMode == AuthMode.Signup ? 320 : 260),
+          width: deviceSize.width * 0.75,
+          padding: EdgeInsets.all(16.0),
+          child: childWidget,
+        ),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
