@@ -91,32 +91,34 @@ class _OrderItemWidgetState extends State<OrderItemWidget> {
               },
             ),
           ),
-          if (_expanded)
-            Container(
-              margin: EdgeInsets.all(16.0),
-              padding: EdgeInsets.all(8.0),
-              height: min(widget.orderItem.items.length * 30.0, 150),
-              decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColorDark.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(8.0)),
-              child: ListView.builder(
-                itemBuilder: (ctx, i) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(widget.orderItem.items[i].title),
-                      Text(
-                        '${widget.orderItem.items[i].quantity}x${widget.orderItem.items[i].price}',
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-                itemCount: widget.orderItem.items.length,
-              ),
+          AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.easeIn,
+            height: _expanded ? min(widget.orderItem.items.length * 30.0, 150) : 0,
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColorDark.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(8.0),
             ),
+            margin: EdgeInsets.all(_expanded ? 16.0 : 0),
+            padding: EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemBuilder: (ctx, i) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(widget.orderItem.items[i].title),
+                    Text(
+                      '${widget.orderItem.items[i].quantity}x${widget.orderItem.items[i].price}',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ],
+                );
+              },
+              itemCount: widget.orderItem.items.length,
+            ),
+          ),
         ],
       ),
     );
